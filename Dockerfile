@@ -6,6 +6,7 @@ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 FROM python:3.12-alpine
 WORKDIR /app
 RUN addgroup -S app && adduser -S app -G app
+RUN apk upgrade --no-cache
 COPY --from=builder /install /usr/local
 COPY --chown=app:app app.py .
 USER app
