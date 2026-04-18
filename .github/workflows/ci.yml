@@ -76,3 +76,24 @@ jobs:
           tags: |
             ghcr.io/fanninggh/flask-devops:latest
             ghcr.io/fanninggh/flask-devops:${{ github.sha }}
+
+  deploy-aws:
+    needs: build-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Trigger App Runner deployment
+        run: |
+          aws apprunner start-deployment \
+            --service-arn arn:aws:apprunner:eu-west-1:779846820095:service/flask-devops/90cb8567baca4bf7a1dd6c1af29d5aad \
+            --region eu-west-1
