@@ -23,6 +23,15 @@ spec:
         image: ghcr.io/fanninggh/flask-devops:latest
         ports:
         - containerPort: 5000
+        envFrom:
+        - configMapRef:
+            name: flask-config
+        env:
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: flask-secrets
+              key: SECRET_KEY
         resources:
           requests:
             cpu: 100m
@@ -36,9 +45,11 @@ spec:
             port: 5000
           initialDelaySeconds: 15
           periodSeconds: 10
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /ready
             port: 5000
           initialDelaySeconds: 5
           periodSeconds: 5
+          failureThreshold: 3
