@@ -1,0 +1,66 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: flask-alerts
+  namespace: flask-app
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+  - name: flask-app.rules
+    rules:
+
+    - alert: FlaskPodCrashing
+      expr: |
+        rate(kube_pod_container_status_restarts_total{
+          namespace="flask-app"
+        }[15m]) * 60 * 15 > 3
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Flask pod {{ $labels.pod }} is crash-looping"
+        description: "Pod has restarted more than 3 times in 15 minutes"
+
+    - alert: FlaskDeploymentUnavailable
+      expr: |
+        kube_deployment_status_replicas_available{
+          namespace="flask-app"
+        } < kube_deployment_spec_replicas{
+          namespace="flask-app"
+        }
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Flask deployment {{ $labels.deployment }} has unavailable replicas"
+        description: "Available replicas is less than desired"
+
+    - alert: FlaskHighCPU
+      expr: |
+        rate(container_cpu_usage_seconds_total{
+          namespace="flask-app",
+          container!=""
+        }[5m]) > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Flask pod {{ $labels.pod }} high CPU"
+        description: "CPU usage above 80% of limit for 5 minutes"
+
+    - alert: FlaskHighMemory
+      expr: |
+        container_memory_working_set_bytes{
+          namespace="flask-app",
+          container!=""
+        } / container_spec_memory_limit_bytes{
+          namespace="flask-app",
+          container!=""
+        } > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Flask pod {{ $labels.pod }} high memory"
+        description: "Memory usage above 80% of limit for 5 minutes"
