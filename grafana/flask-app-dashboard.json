@@ -1,0 +1,138 @@
+{
+  "id": 1698846452232192,
+  "panels": [
+    {
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(kube_pod_info{namespace=\"flask-app\"})"
+        }
+      ],
+      "title": "Running Pods",
+      "type": "stat"
+    },
+    {
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"flask-app\"}"
+        }
+      ],
+      "title": "HPA Current Replicas",
+      "type": "stat"
+    },
+    {
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by(pod)(kube_pod_container_status_restarts_total{namespace=\"flask-app\"})"
+        }
+      ],
+      "title": "Pod Restarts",
+      "type": "stat"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 4,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(container_cpu_usage_seconds_total{namespace=\"flask-app\",container!=\"\"}[5m])",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "title": "CPU Usage by Pod",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 5,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "container_memory_working_set_bytes{namespace=\"flask-app\",container!=\"\"}",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "title": "Memory Usage by Pod",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
+      "id": 6,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kube_deployment_status_replicas_available{namespace=\"flask-app\"}",
+          "legendFormat": "{{deployment}}"
+        }
+      ],
+      "title": "Deployment Replicas Available",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "tags": [
+    "flask",
+    "devops",
+    "sre"
+  ],
+  "timezone": "browser",
+  "title": "Flask App \u2014 RED Method Dashboard",
+  "uid": "415a950d-cb97-4ed9-a002-c35afd5048ae",
+  "version": 1
+}
