@@ -7,3 +7,4 @@ data:
   FLASK_ENV: production
   LOG_LEVEL: INFO
   PROJECT: flask-hello-devops
+  TEMPO_ENDPOINT: http://tempo.monitoring.svc.cluster.local:4317
