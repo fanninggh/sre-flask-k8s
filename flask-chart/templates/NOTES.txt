@@ -1,0 +1,5 @@
+Flask app deployed successfully.
+
+Get the app URL:
+  kubectl port-forward svc/{{ include "flask-chart.fullname" . }} 8080:{{ .Values.service.port }}
+  curl http://localhost:8080/health
