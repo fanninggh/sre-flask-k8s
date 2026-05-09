@@ -58,8 +58,9 @@ def ready():
     except Exception as e:
         checks['redis'] = str(e)
     all_ok = all(v == 'ok' for v in checks.values())
-    return jsonify({'status': 'ready' if all_ok else 'degraded', 'checks': checks}), 200 if all_ok else 503
-
+    status = 'ready' if all_ok else 'degraded'
+    code = 200 if all_ok else 503
+    return jsonify({'status': status, 'checks': checks}), code
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
