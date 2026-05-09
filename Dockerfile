@@ -13,4 +13,4 @@ USER app
 EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD wget -qO- http://127.0.0.1:5000/health || exit 1
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "--timeout", "30", "--graceful-timeout", "25", "--access-logfile", "-", "app:app"]

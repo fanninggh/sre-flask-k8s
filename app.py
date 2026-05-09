@@ -1,4 +1,6 @@
 import logging
+import psycopg2
+import redis as redis_client
 import os
 import time
 
@@ -42,7 +44,21 @@ def health():
 
 @app.route('/ready')
 def ready():
-    return jsonify({"status": "ready"})
+    checks = {}
+    try:
+        conn = psycopg2.connect(os.getenv('DATABASE_URL'), connect_timeout=2)
+        conn.close()
+        checks['db'] = 'ok'
+    except Exception as e:
+        checks['db'] = str(e)
+    try:
+        r = redis_client.from_url(os.getenv('REDIS_URL'), socket_connect_timeout=2)
+        r.ping()
+        checks['redis'] = 'ok'
+    except Exception as e:
+        checks['redis'] = str(e)
+    all_ok = all(v == 'ok' for v in checks.values())
+    return jsonify({'status': 'ready' if all_ok else 'degraded', 'checks': checks}), 200 if all_ok else 503
 
 
 if __name__ == '__main__':
