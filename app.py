@@ -62,5 +62,6 @@ def ready():
     code = 200 if all_ok else 503
     return jsonify({'status': status, 'checks': checks}), code
 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
