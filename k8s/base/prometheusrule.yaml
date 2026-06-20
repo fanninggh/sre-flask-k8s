@@ -1,0 +1,43 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: flask-app-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+  - name: flask-app
+    interval: 15s
+    rules:
+    - alert: FlaskHighErrorRate
+      expr: >-
+        sum(rate(flask_http_request_total{status=~"5.."}[2m]))
+        /
+        sum(rate(flask_http_request_total[2m])) * 100 > 5
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: Flask app high error rate
+        description: Error rate above 5% threshold
+    - alert: FlaskPodsDown
+      expr: >-
+        (count(kube_pod_status_ready{namespace="default",condition="true"})
+        or vector(0)) < 2
+      for: 15s
+      labels:
+        severity: critical
+      annotations:
+        summary: Flask pods below minimum
+        description: Flask pod count below 2
+    - alert: FlaskHighLatency
+      expr: >-
+        histogram_quantile(0.95,
+        sum(rate(flask_http_request_duration_seconds_bucket[2m])) by (le)) > 1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Flask p95 latency above 1 second
+        description: p95 latency exceeds 1s threshold
